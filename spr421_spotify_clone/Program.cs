@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using spr421_spotify_clone.BLL.Services.Genre;
 using spr421_spotify_clone.DAL;
 using spr421_spotify_clone.DAL.Repositories.Genre;
 
@@ -14,8 +15,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultDb"));
 });
 
+// Add automapper
+builder.Services.AddAutoMapper(options =>
+{
+    options.LicenseKey = builder.Configuration["Automapper:LicenseKey"];
+}, AppDomain.CurrentDomain.GetAssemblies());
+
 // Add repositories
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+
+// Add services
+builder.Services.AddScoped<IGenreService, GenreService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

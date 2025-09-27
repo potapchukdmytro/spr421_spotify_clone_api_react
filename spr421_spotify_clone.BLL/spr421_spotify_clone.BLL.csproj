@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\spr421_spotify_clone.DAL\spr421_spotify_clone.DAL.csproj" />
   </ItemGroup>
 
