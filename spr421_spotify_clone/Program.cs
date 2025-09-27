@@ -1,7 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using spr421_spotify_clone.BLL.Services.Genre;
+using spr421_spotify_clone.BLL.Services.Storage;
+using spr421_spotify_clone.BLL.Services.Track;
 using spr421_spotify_clone.DAL;
 using spr421_spotify_clone.DAL.Repositories.Genre;
+using spr421_spotify_clone.DAL.Repositories.Track;
+using spr421_spotify_clone.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +28,12 @@ builder.Services.AddAutoMapper(options =>
 
 // Add repositories
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
+builder.Services.AddScoped<ITrackRepository, TrackRepository>();
 
 // Add services
 builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<ITrackService, TrackService>();
+builder.Services.AddScoped<IStorageService, StorageService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -43,6 +51,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Static files
+app.AddStaticFiles(app.Environment);
 
 app.MapControllers();
 

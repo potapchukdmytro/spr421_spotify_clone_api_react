@@ -19,4 +19,9 @@
     <ProjectReference Include="..\spr421_spotify_clone.DAL\spr421_spotify_clone.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="storage\audio\" />
+    <Folder Include="storage\images\" />
+  </ItemGroup>
+
 </Project>
