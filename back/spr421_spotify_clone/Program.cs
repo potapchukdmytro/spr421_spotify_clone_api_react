@@ -61,6 +61,19 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add cors
+string corsPolicy = "allowall";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsPolicy, builder =>
+    {
+        builder
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -78,6 +91,8 @@ app.UseAuthorization();
 app.AddStaticFiles(app.Environment);
 
 app.MapControllers();
+
+app.UseCors(corsPolicy);
 
 app.Seed();
 
