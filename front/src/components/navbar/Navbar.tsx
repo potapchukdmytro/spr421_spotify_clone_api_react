@@ -5,8 +5,19 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import { Link } from "react-router";
+import { useAppSelector } from "../../hooks/hooks";
+import { logout } from "../../store/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const Navbar = () => {
+    const { isAuth, user } = useAppSelector((state) => state.auth);
+    const dispatch = useDispatch();
+
+    const logoutHanlder = () => {
+        dispatch(logout());
+    }
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
@@ -20,14 +31,21 @@ const Navbar = () => {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography
-                        variant="h6"
-                        component="div"
-                        sx={{ flexGrow: 1 }}
-                    >
-                        News
-                    </Typography>
-                    <Button color="inherit">Login</Button>
+                    <Link to="/" style={{ flexGrow: 1 }}>
+                        <Typography variant="h6" component="div">
+                            Треки
+                        </Typography>
+                    </Link>
+                    {!isAuth ? (
+                        <Link to="/login">
+                            <Button color="inherit">Login</Button>
+                        </Link>
+                    ) : (
+                        <Box>
+                            <Button color="inherit">{user?.email}</Button>
+                            <Button onClick={logoutHanlder} color="inherit">Logout</Button>
+                        </Box>
+                    )}
                 </Toolbar>
             </AppBar>
         </Box>

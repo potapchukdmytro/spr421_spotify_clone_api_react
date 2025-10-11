@@ -22,6 +22,10 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import type { Login } from "./types";
 import axios from "axios";
+import { login } from "../../store/slices/authSlice";
+import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
+import { apiUrl } from "../../env";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -70,8 +74,11 @@ const LoginPage = () => {
 
     const initValues: Login = {
         login: "",
-        password: ""
-    }
+        password: "",
+    };
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -83,19 +90,22 @@ const LoginPage = () => {
 
     const handleSubmit = async (values: Login) => {
         try {
-            const response = await axios.post("https://localhost:7166/api/auth/login", values);
-            const {data} = response;
+            const response = await axios.post(
+                `${apiUrl}/auth/login`,
+                values
+            );
+            const { data } = response;
             const token = data.payload;
-            localStorage.setItem("token", token);
+            dispatch(login(token));
+            navigate("/", { replace: true });
         } catch (error) {
             console.log(error);
         }
-
-    }
+    };
 
     const formik = useFormik({
         initialValues: initValues,
-        onSubmit: handleSubmit
+        onSubmit: handleSubmit,
     });
 
     return (

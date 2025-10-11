@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using spr421_spotify_clone.BLL.Dtos.Track;
 using spr421_spotify_clone.BLL.Services.Storage;
 using spr421_spotify_clone.DAL.Entities;
@@ -59,6 +60,21 @@ namespace spr421_spotify_clone.BLL.Services.Track
             return new ServiceResponse
             {
                 Message = $"Трек '{entity.Title}' додано"
+            };
+        }
+
+        public async Task<ServiceResponse> GetAllAsync()
+        {
+            var entities = await _trackRepository.Tracks
+                .Include(t => t.Genre)
+                .ToListAsync();
+
+            var dtos = _mapper.Map<List<TrackDto>>(entities);
+
+            return new ServiceResponse
+            {
+                Message = "Треки отримано",
+                Payload = dtos
             };
         }
     }

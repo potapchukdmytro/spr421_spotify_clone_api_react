@@ -27,5 +27,12 @@ namespace spr421_spotify_clone.Controllers
             var response = await _trackService.CreateAsync(dto, audioPath);
             return this.ToActionResult(response);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
+        {
+            var response = await _trackService.GetAllAsync();
+            return this.ToActionResult(response);
+        }
     }
 }

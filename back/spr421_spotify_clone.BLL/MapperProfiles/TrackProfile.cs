@@ -12,6 +12,10 @@ namespace spr421_spotify_clone.BLL.MapperProfiles
             CreateMap<CreateTrackDto, TrackEntity>()
                 .ForMember(dest => dest.AudioUrl, opt => opt.MapFrom(src => string.Empty))
                 .ForMember(dest => dest.GenreId, opt => opt.Ignore());
+
+            // TrackEntity -> TrackDto
+            CreateMap<TrackEntity, TrackDto>()
+                .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre));
         }
     }
 }
