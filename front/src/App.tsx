@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import CreateTrackPage from "./pages/track/CreateTrackPage";
 import TrackListPage from "./pages/track/TrackListPage";
 import { useAppSelector } from "./hooks/hooks";
+import { ToastContainer, Zoom } from "react-toastify";
 
 function App() {
     const dispatch = useDispatch();
@@ -22,18 +23,37 @@ function App() {
     }, [dispatch]);
 
     return (
-        <Routes>
-            <Route path="/" element={<DefaultLayout />}>
-                <Route index element={<MainPage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="track">
-                    <Route index element={<TrackListPage />} />
-                    {isAuth && user?.roles.includes("admin") && (
-                        <Route path="create" element={<CreateTrackPage />} />
-                    )}
+        <>
+            <Routes>
+                <Route path="/" element={<DefaultLayout />}>
+                    <Route index element={<MainPage />} />
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="track">
+                        <Route index element={<TrackListPage />} />
+                        {isAuth && user?.roles.includes("admin") && (
+                            <Route
+                                path="create"
+                                element={<CreateTrackPage />}
+                            />
+                        )}
+                    </Route>
                 </Route>
-            </Route>
-        </Routes>
+            </Routes>
+            <ToastContainer
+                position="top-right"
+                autoClose={2000}
+                limit={3}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Zoom}
+            />
+        </>
     );
 }
 

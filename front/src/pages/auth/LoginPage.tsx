@@ -26,6 +26,7 @@ import { login } from "../../store/slices/authSlice";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { apiUrl } from "../../env";
+import { toast } from "react-toastify";
 
 const Card = styled(MuiCard)(({ theme }) => ({
     display: "flex",
@@ -90,16 +91,21 @@ const LoginPage = () => {
 
     const handleSubmit = async (values: Login) => {
         try {
-            const response = await axios.post(
-                `${apiUrl}/auth/login`,
-                values
-            );
+            const response = await axios.post(`${apiUrl}/auth/login`, values);
             const { data } = response;
             const token = data.payload;
             dispatch(login(token));
+            toast.success("Ви успішно увійшли");
             navigate("/", { replace: true });
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            const { response } = error;
+            if (response) {
+                const { data } = response;
+                if (data) {
+                    const {message} = data;
+                    toast.error(message ? message : "Не вдалося увійти");
+                }
+            }
         }
     };
 

@@ -16,6 +16,7 @@ import { useCreateTrackMutation } from "../../store/services/trackApi";
 import { useGetGenresQuery } from "../../store/services/genreApi";
 import { LinearProgress, MenuItem, Select, InputLabel } from "@mui/material";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -111,7 +112,10 @@ const CreateTrackPage = () => {
         const result = await createTrack(formData);
 
         if (result.data?.isSuccess) {
+            toast.success(`Трек "${values.title}" створено`)
             navigate("/");
+        } else {
+            toast.error(result.data?.message);
         }
     };
 
