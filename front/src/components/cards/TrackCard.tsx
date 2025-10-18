@@ -1,5 +1,5 @@
 import type React from "react";
-import type { Track } from "../../pages/mainPage/types";
+import type { Track } from "../../pages/track/types";
 import { Box, Typography } from "@mui/material";
 import "./cards.css";
 

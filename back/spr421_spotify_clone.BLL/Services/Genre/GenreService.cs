@@ -98,7 +98,9 @@ namespace spr421_spotify_clone.BLL.Services.Genre
 
         public async Task<ServiceResponse> GetAllAsync()
         {
-            var entities = await _genreRepository.Genres.ToListAsync();
+            var entities = await _genreRepository.Genres
+                .OrderBy(g => g.Name)
+                .ToListAsync();
 
             var dtos = _mapper.Map<List<GenreDto>>(entities);
 

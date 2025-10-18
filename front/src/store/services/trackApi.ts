@@ -15,8 +15,16 @@ export const trackApi = createApi({
                 method: 'get'
             }),
             providesTags: ['tracks']
+        }),
+        createTrack: build.mutation<ServiceResponse, FormData>({
+            query: (formData) => ({
+                url: 'track',
+                method: 'post',
+                body: formData
+            }),
+            invalidatesTags: ['tracks']
         })
     })
 });
 
-export const { useGetTracksQuery } = trackApi;
+export const { useGetTracksQuery, useCreateTrackMutation } = trackApi;

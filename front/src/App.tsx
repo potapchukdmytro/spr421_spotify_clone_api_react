@@ -6,22 +6,32 @@ import LoginPage from "./pages/auth/LoginPage";
 import { login } from "./store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
+import CreateTrackPage from "./pages/track/CreateTrackPage";
+import TrackListPage from "./pages/track/TrackListPage";
+import { useAppSelector } from "./hooks/hooks";
 
 function App() {
     const dispatch = useDispatch();
+    const { isAuth, user } = useAppSelector((state) => state.auth);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if(token) {
+        if (token) {
             dispatch(login(token));
         }
-    }, [dispatch])
+    }, [dispatch]);
 
     return (
         <Routes>
             <Route path="/" element={<DefaultLayout />}>
                 <Route index element={<MainPage />} />
                 <Route path="login" element={<LoginPage />} />
+                <Route path="track">
+                    <Route index element={<TrackListPage />} />
+                    {isAuth && user?.roles.includes("admin") && (
+                        <Route path="create" element={<CreateTrackPage />} />
+                    )}
+                </Route>
             </Route>
         </Routes>
     );
