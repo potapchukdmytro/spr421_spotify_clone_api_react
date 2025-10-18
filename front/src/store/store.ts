@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authRecuder from "./slices/authSlice";
-import countRecuder from "./slices/countSlice";
+import authReducer from "./slices/authSlice";
+import countReducer from "./slices/countSlice";
+import themeReducer from "./slices/themeSlice";
 import { trackApi } from "./services/trackApi";
 import { genreApi } from "./services/genreApi";
 
 export const store = configureStore({
     reducer: {
-        auth: authRecuder,
-        count: countRecuder,
+        auth: authReducer,
+        count: countReducer,
+        theme: themeReducer,
         [trackApi.reducerPath]: trackApi.reducer,
         [genreApi.reducerPath]: genreApi.reducer,
     },

@@ -1,2 +1,4 @@
-export const apiUrl = import.meta.env.VITE_API_URL;
-export const audioUrl = import.meta.env.VITE_AUDIO_URL;
+export const serverUrl = import.meta.env.VITE_SERVER_URL;
+export const apiUrl = serverUrl + "/api";
+export const audioUrl = serverUrl + "/audio";
+export const imagesUrl = serverUrl + "/images";

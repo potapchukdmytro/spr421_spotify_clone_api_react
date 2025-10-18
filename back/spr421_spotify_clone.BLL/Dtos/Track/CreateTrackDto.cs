@@ -10,7 +10,7 @@ namespace spr421_spotify_clone.BLL.Dtos.Track
         public string? Description { get; set; }
         [Required(ErrorMessage = "Аудіофайл є обов'язковим")]
         public required IFormFile AudioFile { get; set; }
-        public string? PosterUrl { get; set; }
+        public IFormFile? PosterFile { get; set; }
         public DateTime ReleaseDate { get; set; }
         [Required(ErrorMessage = "Жанр є обов'язковим")]
         public required string GenreId { get; set; }

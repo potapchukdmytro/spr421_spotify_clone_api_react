@@ -16,7 +16,6 @@ export interface Track {
 export interface CreateTrack {
     title: string;
     description: string;
-    posterUrl: string;
     releaseDate: string;
     genreId: string;
 }

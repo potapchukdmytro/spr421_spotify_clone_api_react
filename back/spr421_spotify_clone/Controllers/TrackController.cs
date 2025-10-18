@@ -23,8 +23,9 @@ namespace spr421_spotify_clone.Controllers
         {
             var rootPath = _environment.ContentRootPath;
             var audioPath = Path.Combine(rootPath, "storage", "audio");
+            var imagesPath = Path.Combine(rootPath, "storage", "images");
 
-            var response = await _trackService.CreateAsync(dto, audioPath);
+            var response = await _trackService.CreateAsync(dto, audioPath, imagesPath);
             return this.ToActionResult(response);
         }
 

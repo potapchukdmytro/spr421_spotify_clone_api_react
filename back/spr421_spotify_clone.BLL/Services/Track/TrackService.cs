@@ -24,7 +24,7 @@ namespace spr421_spotify_clone.BLL.Services.Track
             _storageService = storageService;
         }
 
-        public async Task<ServiceResponse> CreateAsync(CreateTrackDto dto, string audioFilePath)
+        public async Task<ServiceResponse> CreateAsync(CreateTrackDto dto, string audioFilePath, string posterFilePath)
         {
             var entity = _mapper.Map<TrackEntity>(dto);
 
@@ -42,19 +42,36 @@ namespace spr421_spotify_clone.BLL.Services.Track
 
             entity.Genre = genre;
 
-            var fileName = await _storageService.SaveAudioFileAsync(dto.AudioFile, audioFilePath);
+            // Save audio file
+            var audioFileName = await _storageService.SaveAudioFileAsync(dto.AudioFile, audioFilePath);
 
-            if(fileName == null)
+            if(audioFileName == null)
             {
                 return new ServiceResponse
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest,
-                    Message = "Не вдалося зберегти файл"
+                    Message = "Не вдалося зберегти аудіо"
                 };
             }
+            entity.AudioUrl = audioFileName;
 
-            entity.AudioUrl = fileName;
+            // Save poster file
+            if(dto.PosterFile != null)
+            {
+                var posterFileName = await _storageService.SaveImageFileAsync(dto.PosterFile, posterFilePath);
+                if (posterFileName == null)
+                {
+                    return new ServiceResponse
+                    {
+                        IsSuccess = false,
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Message = "Не вдалося зберегти зображення"
+                    };
+                }
+                entity.PosterUrl = posterFileName;
+            }
+
             await _trackRepository.CreateAsync(entity);
 
             return new ServiceResponse

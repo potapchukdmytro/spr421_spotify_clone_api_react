@@ -17,6 +17,9 @@ import { useGetGenresQuery } from "../../store/services/genreApi";
 import { LinearProgress, MenuItem, Select, InputLabel } from "@mui/material";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import ImageIcon from "@mui/icons-material/Image";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 
 const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -73,6 +76,7 @@ const Container = styled(Stack)(({ theme }) => ({
 
 const CreateTrackPage = () => {
     const [audioFile, setAudioFile] = useState<File | null>(null);
+    const [posterFile, setPosterFile] = useState<File | null>(null);
     const { data, isLoading } = useGetGenresQuery(null);
     const [createTrack] = useCreateTrackMutation();
     const navigate = useNavigate();
@@ -86,7 +90,6 @@ const CreateTrackPage = () => {
         title: "",
         description: "",
         releaseDate: convertDate(new Date()),
-        posterUrl: "",
         genreId: "",
     };
 
@@ -97,22 +100,31 @@ const CreateTrackPage = () => {
         }
     };
 
+    const handlePosterFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            setPosterFile(files[0]);
+        }
+    };
+
     const handleSubmit = async (values: CreateTrack) => {
         const formData = new FormData();
 
         formData.append("title", values.title);
         formData.append("description", values.description);
         formData.append("releaseDate", values.releaseDate);
-        formData.append("posterUrl", values.posterUrl);
         formData.append("genreId", values.genreId);
         if (audioFile) {
             formData.append("audioFile", audioFile);
+        }
+        if (posterFile) {
+            formData.append("posterFile", posterFile);
         }
 
         const result = await createTrack(formData);
 
         if (result.data?.isSuccess) {
-            toast.success(`Трек "${values.title}" створено`)
+            toast.success(`Трек "${values.title}" створено`);
             navigate("/");
         } else {
             toast.error(result.data?.message);
@@ -197,21 +209,6 @@ const CreateTrackPage = () => {
                                 onChange={formik.handleChange}
                             />
                         </FormControl>
-                        <FormControl>
-                            <FormLabel htmlFor="posterUrl">
-                                Обкладинка
-                            </FormLabel>
-                            <TextField
-                                name="posterUrl"
-                                type="text"
-                                placeholder="Обкладинка"
-                                id="posterUrl"
-                                fullWidth
-                                variant="outlined"
-                                value={formik.values.posterUrl}
-                                onChange={formik.handleChange}
-                            />
-                        </FormControl>
                         <FormControl fullWidth>
                             <InputLabel id="genreId">Жанр</InputLabel>
                             <Select
@@ -233,6 +230,7 @@ const CreateTrackPage = () => {
                                 ))}
                             </Select>
                         </FormControl>
+                        {/* Аудіо файл */}
                         <Button
                             color="secondary"
                             component="label"
@@ -248,8 +246,42 @@ const CreateTrackPage = () => {
                                 onChange={handleAudioFileChange}
                             />
                         </Button>
-                        {audioFile && <Typography>{audioFile.name}</Typography>}
-
+                        {audioFile && (
+                            <AudioPlayer
+                                volume={0.05}
+                                src={URL.createObjectURL(audioFile)}
+                            />
+                        )}
+                        {/* Обкладинка */}
+                        <Button
+                            color="secondary"
+                            component="label"
+                            role={undefined}
+                            variant="contained"
+                            tabIndex={-1}
+                            startIcon={<ImageIcon />}
+                        >
+                            Завантажити обкладинку
+                            <VisuallyHiddenInput
+                                accept="image/*"
+                                type="file"
+                                onChange={handlePosterFileChange}
+                            />
+                        </Button>
+                        {posterFile && (
+                            <Box
+                                display="flex"
+                                width="100%"
+                                justifyContent="center"
+                            >
+                                <Box
+                                    borderRadius="15px"
+                                    height="200px"
+                                    component="img"
+                                    src={URL.createObjectURL(posterFile)}
+                                />
+                            </Box>
+                        )}
                         <Button type="submit" fullWidth variant="contained">
                             Створити
                         </Button>

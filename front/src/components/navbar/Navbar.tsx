@@ -9,6 +9,8 @@ import { Link } from "react-router";
 import { useAppSelector } from "../../hooks/hooks";
 import { logout } from "../../store/slices/authSlice";
 import { useDispatch } from "react-redux";
+import ContrastIcon from "@mui/icons-material/Contrast";
+import { switchTheme } from "../../store/slices/themeSlice";
 
 const Navbar = () => {
     const { isAuth, user } = useAppSelector((state) => state.auth);
@@ -16,6 +18,10 @@ const Navbar = () => {
 
     const logoutHanlder = () => {
         dispatch(logout());
+    };
+
+    const hanleChangeTheme = () => {
+        dispatch(switchTheme());
     }
 
     return (
@@ -36,6 +42,9 @@ const Navbar = () => {
                             Треки
                         </Typography>
                     </Link>
+                    <IconButton sx={{ color: "white" }} onClick={hanleChangeTheme}>
+                        <ContrastIcon />
+                    </IconButton>
                     {!isAuth ? (
                         <Link to="/login">
                             <Button color="inherit">Login</Button>
@@ -43,7 +52,9 @@ const Navbar = () => {
                     ) : (
                         <Box>
                             <Button color="inherit">{user?.email}</Button>
-                            <Button onClick={logoutHanlder} color="inherit">Logout</Button>
+                            <Button onClick={logoutHanlder} color="inherit">
+                                Logout
+                            </Button>
                         </Box>
                     )}
                 </Toolbar>

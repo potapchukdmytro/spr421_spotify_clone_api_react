@@ -57,7 +57,7 @@ const TrackListPage = () => {
                             justifyContent="center"
                         >
                             <Link to="/track/create">
-                                <IconButton color="warning">
+                                <IconButton color="primary">
                                     <AddCircleOutlineIcon
                                         sx={{ fontSize: "2.5em" }}
                                     />

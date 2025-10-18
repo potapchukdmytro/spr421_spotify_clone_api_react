@@ -20,3 +20,7 @@ export interface AuthState {
     isAuth: boolean;
     user: User | null;
 }
+
+export interface ThemeState {
+    firstTheme: boolean;
+}
