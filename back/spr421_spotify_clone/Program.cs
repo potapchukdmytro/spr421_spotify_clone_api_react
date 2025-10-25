@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Serilog;
 using spr421_spotify_clone.BLL.Services.Auth;
 using spr421_spotify_clone.BLL.Services.Genre;
@@ -12,6 +13,8 @@ using spr421_spotify_clone.DAL.Initializer;
 using spr421_spotify_clone.DAL.Repositories.Genre;
 using spr421_spotify_clone.DAL.Repositories.Track;
 using spr421_spotify_clone.Infrastructure;
+using spr421_spotify_clone.Jobs;
+using spr421_spotify_clone.Middlewares;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -44,11 +47,22 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 // Add logging
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.File("logs/.log", rollingInterval: RollingInterval.Hour)
+    .WriteTo.File("logs/.log", rollingInterval: RollingInterval.Minute)
     .Enrich.FromLogContext()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+// Add quartz
+var jobs = new (Type type, string schedule)[]
+{
+    (typeof(HelloJob), "0 0 0/1 * * ?"),
+    (typeof(LogsCleaningJob), "0 * * * * ?"),
+    (typeof(EmailJob), "30 * * * * ?")
+};
+
+builder.Services.AddJobs(jobs);
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 // Add automapper
 builder.Services.AddAutoMapper(options =>
@@ -88,6 +102,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<LoggingMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -97,6 +114,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Static files
