@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using spr421_spotify_clone.BLL.Dtos.Genre;
 using spr421_spotify_clone.DAL.Entities;
 using spr421_spotify_clone.DAL.Repositories.Genre;
@@ -10,18 +11,22 @@ namespace spr421_spotify_clone.BLL.Services.Genre
     public class GenreService : IGenreService
     {
         private readonly IGenreRepository _genreRepository;
+        private readonly ILogger<GenreService> _logger;
         private readonly IMapper _mapper;
 
-        public GenreService(IGenreRepository genreRepository, IMapper mapper)
+        public GenreService(IGenreRepository genreRepository, IMapper mapper, ILogger<GenreService> logger)
         {
             _genreRepository = genreRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse> CreateAsync(CreateGenreDto dto)
         {
             if(await _genreRepository.IsExistsAsync(dto.Name))
             {
+                _logger.LogWarning("Спроба додати жанр з існуючою назвою: {GenreName}", dto.Name);
+
                 return new ServiceResponse
                 {
                     IsSuccess = false,
@@ -33,6 +38,8 @@ namespace spr421_spotify_clone.BLL.Services.Genre
             var entity = _mapper.Map<GenreEntity>(dto);
 
             await _genreRepository.CreateAsync(entity);
+
+            _logger.LogInformation("Жанр '{GenreName}' успішно додано", dto.Name);
 
             return new ServiceResponse
             {
@@ -80,6 +87,8 @@ namespace spr421_spotify_clone.BLL.Services.Genre
 
             if(entity == null)
             {
+                _logger.LogError("Спроба видалити неіснуючий жанр з id: {GenreId}", id);
+
                 return new ServiceResponse
                 {
                     IsSuccess = false,
@@ -129,6 +138,8 @@ namespace spr421_spotify_clone.BLL.Services.Genre
 
             if(entity == null)
             {
+                _logger.LogCritical(400, $"Жанр з id: {id} не знайдено. [{DateTime.Now.ToString()}]");
+
                 return new ServiceResponse
                 {
                     IsSuccess = false,

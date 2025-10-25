@@ -10,10 +10,12 @@ namespace spr421_spotify_clone.Controllers
     public class GenreController : ControllerBase
     {
         private readonly IGenreService _genreService;
+        private readonly ILogger<GenreController> _logger;
 
-        public GenreController(IGenreService genreService)
+        public GenreController(IGenreService genreService, ILogger<GenreController> logger)
         {
             _genreService = genreService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -47,6 +49,8 @@ namespace spr421_spotify_clone.Controllers
         [HttpGet("by-name")]
         public async Task<IActionResult> GetByNameAsync([FromQuery] string name)
         {
+            throw new Exception("Test exception for Sentry logging");
+
             var response = await _genreService.GetByNameAsync(name);
             return this.ToActionResult(response);
         }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using spr421_spotify_clone.BLL.Services.Auth;
 using spr421_spotify_clone.BLL.Services.Genre;
 using spr421_spotify_clone.BLL.Services.Storage;
@@ -11,6 +12,8 @@ using spr421_spotify_clone.DAL.Initializer;
 using spr421_spotify_clone.DAL.Repositories.Genre;
 using spr421_spotify_clone.DAL.Repositories.Track;
 using spr421_spotify_clone.Infrastructure;
+
+Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +40,15 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 })
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<AppDbContext>();
+
+// Add logging
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/.log", rollingInterval: RollingInterval.Hour)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add automapper
 builder.Services.AddAutoMapper(options =>
