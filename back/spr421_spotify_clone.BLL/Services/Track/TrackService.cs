@@ -94,5 +94,30 @@ namespace spr421_spotify_clone.BLL.Services.Track
                 Payload = dtos
             };
         }
+
+        public async Task<ServiceResponse> RemoveAsync(string id, string audioFilePath)
+        {
+            var entity = await _trackRepository.GetByIdAsync(id);
+
+            if(entity == null)
+            {
+                return new ServiceResponse
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    Message = $"Трек з id '{id}' не знайдено"
+                };
+            }
+
+            audioFilePath = Path.Combine(audioFilePath, entity.AudioUrl);
+
+            File.Delete(audioFilePath);
+            await _trackRepository.DeleteAsync(entity);
+
+            return new ServiceResponse
+            {
+                Message = $"Трек '{entity.Title}' видалено"
+            };
+        }
     }
 }

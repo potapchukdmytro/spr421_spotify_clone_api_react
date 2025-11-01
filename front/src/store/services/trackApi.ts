@@ -4,7 +4,10 @@ import type { ServiceResponse } from './types';
 
 export const trackApi = createApi({
     baseQuery: fetchBaseQuery({
-        baseUrl: apiUrl
+        baseUrl: apiUrl,
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
     }),
     tagTypes: ['tracks'],
     reducerPath: 'track',

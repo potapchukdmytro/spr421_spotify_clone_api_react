@@ -1,5 +1,7 @@
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Quartz;
 using Serilog;
 using spr421_spotify_clone.BLL.Services.Auth;
@@ -15,8 +17,9 @@ using spr421_spotify_clone.DAL.Repositories.Track;
 using spr421_spotify_clone.Infrastructure;
 using spr421_spotify_clone.Jobs;
 using spr421_spotify_clone.Middlewares;
+using System.Text;
 
-Console.OutputEncoding = System.Text.Encoding.UTF8;
+Console.OutputEncoding = Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,14 +64,42 @@ var jobs = new (Type type, string schedule)[]
     (typeof(EmailJob), "30 * * * * ?")
 };
 
-builder.Services.AddJobs(jobs);
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+//builder.Services.AddJobs(jobs);
+//builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 // Add automapper
 builder.Services.AddAutoMapper(options =>
 {
     options.LicenseKey = builder.Configuration["Automapper:LicenseKey"];
 }, AppDomain.CurrentDomain.GetAssemblies());
+
+// Add authentication
+// Налаштування JWT аутентифікації та авторизації для захисту API
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
+if(jwtSettings is null || string.IsNullOrEmpty(jwtSettings.SecretKey))
+{
+    throw new Exception("JwtSettings is not configured properly.");
+}
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(opt =>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        RequireExpirationTime = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        ClockSkew = TimeSpan.Zero,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+    };
+});
 
 // Add repositories
 builder.Services.AddScoped<IGenreRepository, GenreRepository>();
@@ -85,7 +116,40 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSet
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Налаштування Swagger для документування API та підтримки JWT аутентифікації в Swagger UI
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "spr421_spotify_clone API",
+        Version = "v1"
+    });
+    // Add JWT authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // Add cors
 string corsPolicy = "allowall";

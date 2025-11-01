@@ -17,9 +17,10 @@ const DefaultRoutes = () => {
                 <Route path="login" element={<LoginPage />} />
                 <Route path="track">
                     <Route index element={<TrackListPage />} />
-                    {isAuth && user?.roles.includes("admin") && (
+                    <Route path="create" element={<CreateTrackPage />} />
+                    {/* {isAuth && user?.roles.includes("admin") && (
                         <Route path="create" element={<CreateTrackPage />} />
-                    )}
+                    )} */}
                 </Route>
                 <Route path="*" element={<NotFoundPage />} />
             </Route>

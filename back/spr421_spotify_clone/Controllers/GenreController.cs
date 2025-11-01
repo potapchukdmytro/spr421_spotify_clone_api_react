@@ -49,8 +49,6 @@ namespace spr421_spotify_clone.Controllers
         [HttpGet("by-name")]
         public async Task<IActionResult> GetByNameAsync([FromQuery] string name)
         {
-            throw new Exception("Test exception for Sentry logging");
-
             var response = await _genreService.GetByNameAsync(name);
             return this.ToActionResult(response);
         }
