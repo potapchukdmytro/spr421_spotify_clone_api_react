@@ -10,7 +10,7 @@ import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import type { CreateTrack, Genre } from "./types";
 import { useFormik } from "formik";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import { useCreateTrackMutation } from "../../store/services/trackApi";
 import { useGetGenresQuery } from "../../store/services/genreApi";
@@ -77,7 +77,7 @@ const Container = styled(Stack)(({ theme }) => ({
 const CreateTrackPage = () => {
     const [audioFile, setAudioFile] = useState<File | null>(null);
     const [posterFile, setPosterFile] = useState<File | null>(null);
-    const { data, isLoading } = useGetGenresQuery(null);
+    const { data, isLoading, isSuccess } = useGetGenresQuery(null);
     const [createTrack] = useCreateTrackMutation();
     const navigate = useNavigate();
 
@@ -85,6 +85,15 @@ const CreateTrackPage = () => {
         const iso = date.toISOString().substring(0, 10);
         return iso;
     };
+
+    useEffect(() => {
+        if(isSuccess) {
+            if(data.payload.length > 0) {
+                const genreId = data.payload[0].id;
+                formik.setFieldValue("genreId", genreId);
+            }
+        } 
+    }, [isSuccess]);
 
     const initValues: CreateTrack = {
         title: "",
@@ -215,12 +224,12 @@ const CreateTrackPage = () => {
                                 labelId="demo-simple-select-label"
                                 id="genreId"
                                 name="genreId"
+                                label="Жанр"
                                 value={
                                     formik.values.genreId === ""
                                         ? data?.payload[0].id
                                         : formik.values.genreId
                                 }
-                                label="Жанр"
                                 onChange={formik.handleChange}
                             >
                                 {data?.payload.map((genre: Genre) => (
